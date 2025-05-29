@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Birthday Invite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fef6e4;
+            text-align: center;
+            padding: 40px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .redcow { background: #ff8fab; }
+        .narnija { background: #a0c4ff; }
+    </style>
+</head>
+<body>
+    <h1>🎉 Bane and Sean Invite You 🎉</h1>
+    <p>We need your help to choose where you want to spend this amazing day with us:</p>
+    <form action="/vote" method="post">
+        <button name="location" value="Red Cow" class="redcow">1. Red Cow 🐮</button>
+        <button name="location" value="Narnija" class="narnija">2. Narnija 🦁</button>
+    </form>
+</body>
+</html>

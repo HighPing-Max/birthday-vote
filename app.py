@@ -1,20 +1,21 @@
-from flask import Flask, render_template_string, request, redirect
+from flask import Flask, render_template_string, request, redirect, url_for, session
 import os
 
 app = Flask(__name__)
+app.secret_key = "tajni_kljuc"  # Needed for session
 
-votes = {"Red Cow": 0, "Narnija": 0}
+votes = {"Red Cow 🐄": 0, "Narnija 🦁": 0}
 
-template = """
+vote_template = """
 <!doctype html>
-<html lang="en">
+<html lang="sr">
 <head>
   <meta charset="utf-8">
-  <title>Birthday Vote 🎉</title>
+  <title>Rođendansko Glasanje 🎉</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #f9c5d1, #fddde6);
+      background: linear-gradient(135deg, #ffffff, #cce6ff); /* White and blue */
       text-align: center;
       padding: 50px;
     }
@@ -25,7 +26,7 @@ template = """
       margin: 20px 0;
     }
     button {
-      background-color: #ff69b4;
+      background-color: #007BFF;
       color: white;
       border: none;
       padding: 15px 30px;
@@ -35,7 +36,7 @@ template = """
       border-radius: 10px;
     }
     button:hover {
-      background-color: #ff1493;
+      background-color: #0056b3;
     }
     .results {
       margin-top: 40px;
@@ -43,17 +44,59 @@ template = """
   </style>
 </head>
 <body>
-  <h1>Bane and Sean invite you to a crazy, fun birthday party! 🎂🎈</h1>
-  <p>We need your help to choose where to celebrate:</p>
+  <h1>Bane i Sean vas pozivaju na ludu i zabavnu rođendansku žurku! 🎂🎈</h1>
+  <p>Pomozi nam da izaberemo gde ćemo da slavimo:</p>
   <form method="POST">
-    <button name="vote" value="Red Cow">Red Cow</button>
-    <button name="vote" value="Narnija">Narnija</button>
+    <button name="vote" value="Red Cow 🐄">Red Cow 🐄</button>
+    <button name="vote" value="Narnija 🦁">Narnija 🦁</button>
   </form>
   <div class="results">
-    <h2>Current Votes:</h2>
-    <p>Red Cow: {{ votes["Red Cow"] }}</p>
-    <p>Narnija: {{ votes["Narnija"] }}</p>
+    <h2>Trenutni Rezultati:</h2>
+    <p>Red Cow 🐄: {{ votes["Red Cow 🐄"] }}</p>
+    <p>Narnija 🦁: {{ votes["Narnija 🦁"] }}</p>
   </div>
+</body>
+</html>
+"""
+
+thank_you_template = """
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8">
+  <title>Hvala na glasanju 🎉</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ffffff, #cce6ff);
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 2.5em;
+    }
+    p {
+      font-size: 1.2em;
+    }
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      font-size: 1em;
+      text-decoration: none;
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+    a:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hvala što si glasao! ✅</h1>
+  <p>Vidimo se na žurci 14.06.2025 🎉</p>
+  <a href="/">Nazad na početnu</a>
 </body>
 </html>
 """
@@ -64,8 +107,15 @@ def index():
         vote = request.form.get("vote")
         if vote in votes:
             votes[vote] += 1
-        return redirect("/")
-    return render_template_string(template, votes=votes)
+            session["voted"] = True
+        return redirect(url_for("thank_you"))
+    return render_template_string(vote_template, votes=votes)
+
+@app.route("/thank-you")
+def thank_you():
+    if not session.get("voted"):
+        return redirect(url_for("index"))
+    return render_template_string(thank_you_template)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
